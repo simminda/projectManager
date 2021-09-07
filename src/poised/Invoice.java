@@ -15,10 +15,10 @@ public class Invoice {
 	
     public String toString() {
 		String output = "Tax Invoice";
-		output += "\nInvoice Number\t: " + invoiceNo;
+		output += "\n\nInvoice Number\t: " + invoiceNo;
 		output += "\nInvoice Date\t: " + invoiceDate;
-		output += "\n/nCustomer\t: " + customer;
-		output += "\n/nAmount\t: " + projectFee;
+		output += "\nCustomer\t: " + customer;
+		output += "\nAmount\t\t: R" + projectFee;
 			   
 		return output;
     }

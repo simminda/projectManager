@@ -23,10 +23,10 @@ public class Assignee {
 		   
 	public String toString() {
 		String output = role;
-		output += "\nName\t: " + name;
-		output += "\nTel No\t: " + tel;
-		output += "\nEmail\t: " + email;
-		output += "\nAddress\t: " + address;
+		output += "\nName\t\t: " + name;
+		output += "\nTel No\t\t: " + tel;
+		output += "\nEmail\t\t: " + email;
+		output += "\nAddress\t\t: " + address;
 			   
 		return output;
 	}
