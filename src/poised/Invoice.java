@@ -22,5 +22,11 @@ public class Invoice {
 			   
 		return output;
     }
+    
+	public String oneLine(Invoice invoiceNo, String projectNum) {
+		String output = projectNum + ", " + invoiceNo + ", " + invoiceDate + ", " + customer + ", " + projectFee;
+		
+		return output;
+	}
       
 }

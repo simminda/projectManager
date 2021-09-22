@@ -31,4 +31,10 @@ public class Assignee {
 		return output;
 	}
 
+	public String oneLine(Assignee conCurr, String projectNum) {
+		String output = projectNum + ", " + role + ", " + name + ", " + tel + ", " + email + ", " + address;
+		
+		return output;
+	}
+
 }

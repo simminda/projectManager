@@ -17,8 +17,7 @@ public class CompleteProject {
 	
     // Methods
     public CompleteProject(Integer projectNumber, String projectName, String buildingType, String projectAddress,
-    				String erfNumber, Double projectFee, Double projectBalance, String completionDate, Double invoiceNo) 
-    {
+    				String erfNumber, Double projectFee, Double projectBalance, String completionDate, Double invoiceNo) {
     	this.projectNumber = projectNumber;
     	this.projectName = projectName;
     	this.buildingType = buildingType;
@@ -44,5 +43,12 @@ public class CompleteProject {
 			   
 		return output;
     }
+    
+    public String oneLine(Project currProject) {
+		String output = projectNumber + ", " + projectName + ", " + buildingType + ", " + projectAddress + ", " + erfNumber + ", " 
+						+ projectFee + ", " + projectBalance + ", " + completionDate + ", " + invoiceNo;
+			   
+		return output;
+	}
     
 }
