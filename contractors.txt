@@ -3,3 +3,5 @@
 123, Contractor, Speed Construction, 0114001234, ben@speedconstruction.co.za, 15 Far Road_Waterfall_Midrand_1600
 124, Contractor, Topz Consulting, 0111001212, lucy@topz.com, 171 Fox Street_Boksburg_1500
 125, Contractor, Super Contractors, 0104001111, reception@supercon.co.za, 25 Super Drive_Bricktown_1000
+126, Contractor, Tim Projects, 0108002112, info@timprojects.org, 12 sky avenue_ Mainington_ Johannesburg_ 1000
+127, Contractor, Mabaso Consulting, 0314004123, reception@mabaso.co.za, 12 Harry Street_ Montclair_ Durban_ 4002

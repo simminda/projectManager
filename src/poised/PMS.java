@@ -277,7 +277,16 @@ public class PMS {
 			
 		while ((line = br.readLine()) != null) {
 		    projectNo = Integer.parseInt(line) + 1;
+			
 		}
+		br.close();
+		
+		// save new project number to file 
+		FileWriter fileP = new FileWriter("projectCount.txt");
+		BufferedWriter bufferP = new BufferedWriter(fileP);
+						
+		bufferP.write("" + projectNo);
+		bufferP.close(); 
 		
 		// ask user to capture rest of details
 		Scanner details = new Scanner(System.in);
@@ -287,18 +296,19 @@ public class PMS {
 		String buildingType = details.nextLine();
 		System.out.println("Enter project address: ");
 		String projectAddress = details.nextLine();
+		String projectAddressF = projectAddress.replace(',', '_'); // ensure user does not capture commas (file separator is commas)
 		System.out.println("Enter erf number: ");
 		String erfNumber = details.nextLine();
-		System.out.println("Enter project Fee: ");
+		System.out.println("Enter project Fee (e.g. '10000'): ");
 		Double projectFee = details.nextDouble();
-		System.out.println("Enter Outstanding balance: ");
+		System.out.println("Enter Outstanding balance (e.g. '10000'): ");
 		Double projectBalance = details.nextDouble();
 		details.nextLine();
-		System.out.println("Enter project deadline: ");
+		System.out.println("Enter project deadline (e.g. '31/12/2010'): ");
 		String deadline = details.nextLine();
 		
 		// assign user inputs to new object and print confirmation output
-		Project currProject = new Project(projectNo, projectName, buildingType, projectAddress,
+		Project currProject = new Project(projectNo, projectName, buildingType, projectAddressF,
 											erfNumber, projectFee, projectBalance, deadline);
 		System.out.println("\nThank you. Project Succesfully Captured.\n"); 
 		System.out.println(currProject + "\n");
@@ -309,8 +319,9 @@ public class PMS {
 		FileWriter file = new FileWriter("projects.txt", true);
 		BufferedWriter buffer = new BufferedWriter(file);
 			
-		buffer.write(newStr);
+		buffer.write(newStr + "\n");
 		buffer.close();    
+		
 
 		// capture customer person
 		String role = "Contact";
@@ -322,9 +333,10 @@ public class PMS {
 		String email = details.nextLine();
 		System.out.println("Enter Address: ");
 		String address = details.nextLine();
+		String addressF = address.replace(",", "_");	// ensure user does not capture commas (file separator is commas)
 		
 		// assign user inputs to new object and print confirmation output
-		Assignee person = new Assignee(role, name, tel, email, address);
+		Assignee person = new Assignee(role, name, tel, email, addressF);
 		System.out.println("\nThank you. Details Succesfully Captured.\n"); 
 		System.out.println(person + "\n");
 		
@@ -334,7 +346,7 @@ public class PMS {
 		FileWriter file1 = new FileWriter("contacts.txt", true);
 		BufferedWriter buffer1 = new BufferedWriter(file1);
 					
-		buffer1.write(newStr1);
+		buffer1.write(newStr1 + "\n");
 		buffer1.close(); 	
 		
 		// capture architect
@@ -347,9 +359,10 @@ public class PMS {
 		String emailArc = details.nextLine();
 		System.out.println("Enter Address: ");
 		String addressArc = details.nextLine();
+		String addressArcF = addressArc.replace(",", "_");		// ensure user does not capture commas (file separator is commas)
 		
 		// assign user inputs to new object and print confirmation output
-		Assignee arc = new Assignee(roleArc, nameArc, telArc, emailArc, addressArc);
+		Assignee arc = new Assignee(roleArc, nameArc, telArc, emailArc, addressArcF);
 		System.out.println("\nThank you. Details Succesfully Captured.\n"); 
 		System.out.println(arc + "\n");
 		
@@ -359,7 +372,7 @@ public class PMS {
 		FileWriter file2 = new FileWriter("architects.txt", true);
 		BufferedWriter buffer2 = new BufferedWriter(file2);
 					
-		buffer2.write(newStr2);
+		buffer2.write(newStr2 + "\n");
 		buffer2.close(); 
 		
 		// capture contractor
@@ -372,19 +385,20 @@ public class PMS {
 		String emailCon = details.nextLine();
 		System.out.println("Enter Address: ");
 		String addressCon = details.nextLine();
+		String addressConF = addressCon.replace(",", "_"); 	// ensure user does not capture commas (file separator is commas)
 		
 		// assign user inputs to new object and print confirmation output
-		Assignee con = new Assignee(roleCon, nameCon, telCon, emailCon, addressCon);
+		Assignee con = new Assignee(roleCon, nameCon, telCon, emailCon, addressConF);
 		System.out.println("\nThank you. Details Succesfully Captured.\n"); 
 		System.out.println(con + "\n");
 		
 		// save changes to file 
 		String newStr3 = con.oneLine(con, ("" + projectNo)); // final details to be saved to file
 				
-		FileWriter file3 = new FileWriter("architects.txt", true);
+		FileWriter file3 = new FileWriter("contractors.txt", true);
 		BufferedWriter buffer3 = new BufferedWriter(file3);
 					
-		buffer3.write(newStr3);
+		buffer3.write(newStr3 + "\n");
 		buffer3.close(); 
 	}
 

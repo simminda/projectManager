@@ -1,3 +1,3 @@
 118, Apartment Scott, Apartment, 23 Dune Street_Meadowville_2000, 000000003568, 1200000.0, 1080000.0, 20/05/2021
 119, House Tim, House, 1143 Spooner Street_Quahog_2002, 000000003980, 250000.0, 225000.0, 31/05/2021
-
+126, House Schnooks, House, 12 Pretoria Road_ Zeeland_ 1655, 000000001256, 2000000.0, 1800000.0, 25/06/2021

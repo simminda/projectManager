@@ -3,3 +3,5 @@
 123, Architect, Speed Construction, 0114001234, dave@speedconstruction.co.za, 15 Far Road_Waterfall_Midrand_1600
 124, Architect, Glengarry Consulting, 0111001212, shelly@glenn.co.za, 171 Fox Street_Boksburg_1500
 125, Architect, New Dezigns, 0104001111, reception@supercon.co.za, 25 Super Drive_Bricktown_1000
+126, Architect, Sky Architects, 0112004004, pieter@skyarc.co.za, 1 main road_ Fordsburg_ Johannesburg_ 1000
+127, Architect, Zonke Builders, 0601002112, sibongiseni@zonkebonke.co.za, 36 Main Road_ Isipingo_ Durban_ 4000
