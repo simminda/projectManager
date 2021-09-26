@@ -6,189 +6,161 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
 public class PMS {
 
 	public static void main(String[] args) throws IOException {
-		// loop through main menu using while
+		// enclose code in loop to take user back to main menu after completing tasks
 		while (true) {
 			mainMenu();
 			
-			Scanner s = new Scanner(System.in);
-			int input = s.nextInt();
+			try {
+				Scanner s = new Scanner(System.in);
+				int input = s.nextInt();
+				s.nextLine(); // clears the buffer
 			
-			if (input == 1) {
-				captureProject();
-			    
-			    mainOrExit(); // go back to main menu or exit
-			} else if (input == 2) {
-				System.out.println("Enter project number: ");
-				Scanner sc = new Scanner(System.in);
-				String in = sc.nextLine();
-				
-				Project currProject = selectProject(in);
-				
-				if (currProject == null) {
-					mainOrExit();
-				} else {
-					System.out.println(currProject); 	// show user current details before asking them to edit
-					Assignee currContractor = selectContractor(in);
-					System.out.println(currContractor); 
+				if (input == 1) {
+					captureProject();
+				    
+				    mainOrExit(); // offer option to go back to main menu or quit program
+				} else if (input == 2) {
+					System.out.println("Enter project number: ");
+					Scanner sc = new Scanner(System.in);
+					String projNumInput = sc.nextLine();
 					
-					System.out.println("\nWhat would you like to do? ");
-					System.out.println("'1' - edit due date");
-					System.out.println("'2' - edit balance");
-					System.out.println("'3' - update contractor details");
-					System.out.println("'4' - Finalize project");
+					Project currProject = selectProject(projNumInput);
 					
-					// accept user input and call on applicable function
-					Scanner scan = new Scanner(System.in);
-					Integer edit = scan.nextInt();
-					
-					if (edit == 1) {
-						// edit due date
-						System.out.println("Enter Due Date: ");
-						Scanner st = new Scanner(System.in);
-						String date = st.nextLine();
+					if (currProject == null) {
+						mainOrExit();
+					} else {
+						System.out.println(currProject); 	// show user current details before asking them to edit
+						Assignee currContractor = selectContractor(projNumInput); // get details of contractor for this project number
+						System.out.println(currContractor); 
 						
-						// create new project object to manipulate using selectProject method which retrieves existing projects from file
-						Project currProjectDate = selectProject(in);
-						currProjectDate.setDeadline(date);
+						System.out.println("\nWhat would you like to do? ");
+						System.out.println("'1' - edit due date");
+						System.out.println("'2' - edit balance");
+						System.out.println("'3' - update contractor details");
+						System.out.println("'4' - Finalize project");
 						
-						String newStr = currProjectDate.oneLine(currProjectDate); // final details to be saved to file
+						// accept user input and call on applicable function
+						Scanner scan = new Scanner(System.in);
+						Integer edit = scan.nextInt();
 						
-						// print confirmation output
-						System.out.println("\nThank you. Date change saved.\n"); 
-						
-					    commitProject(in, newStr); // arguments are input string and output string
-					    
-					    mainOrExit(); 
-					} else if (edit == 2) {
-						// edit balance
-						System.out.println("Enter new balance e.g '100000': ");
-						Scanner st = new Scanner(System.in);
-						Double balance = st.nextDouble();
-						st.nextLine();
-						
-						// create new project object to manipulate using selectProject method which retrieves existing projects from file
-						Project currProjectBal = selectProject(in);	
-						currProjectBal.setBalance(balance);
-						
-						String newStr = currProjectBal.oneLine(currProjectBal); // final details to be saved to file
-						
-						// print confirmation output
-						System.out.println("\nThank you. Balance updated.\n"); 
-						System.out.println(currProjectBal); 
-					   
-						commitProject(in, newStr); // arguments are input string and output string
-					    
-					    mainOrExit(); 
-					} else if (edit == 3) {
-						// edit contractor details
-						Assignee con = selectContractor(in);
-						System.out.println(con + "\n");
-						Scanner st = new Scanner(System.in);
-						String roleCon = "Contractor";
-						System.out.println("Enter updated contractor name: ");
-						String nameCon = st.nextLine();
-						System.out.println("Enter updated Tel No: ");
-						String telCon = st.nextLine();
-						System.out.println("Enter updated email: ");
-						String emailCon = st.nextLine();
-						System.out.println("Enter updated Address: ");
-						String addressCon = st.nextLine();
-						
-						// assign user inputs to new object and print confirmation output
-						Assignee conCurr = new Assignee(roleCon, nameCon, telCon, emailCon, addressCon);
-						String newStr = conCurr.oneLine(conCurr, in); // final details to be saved to file
-						
-						System.out.println("\nThank you. Contractor details Succesfully updated.\n"); 
-					    System.out.println(conCurr + "\n");
-					    
-					    // save changes to file
-					    ArrayList<String> contractorList = new ArrayList<String>();
-						
-						FileReader fileIn = new FileReader("contractors.txt");
-						BufferedReader br = new BufferedReader(fileIn);
-						
-						String line = "";
-						
-						while ((line = br.readLine()) != null) {
-							String[] lineArray = line.split(", ");		
-							if (lineArray[0].equals(in)) {
-								line = newStr;	// replace the line containing desired contractor with newStr
-							}
-							contractorList.add(line + "\n");
-						}
-						br.close();
-						
-						String finalStr = Arrays.toString(contractorList.toArray()).replace("[", "").replace("]", "");
-						finalStr = finalStr.replace("\n, ", "\n");	// remove the comma space separator for the arraylist elements	
-						
-						FileWriter file = new FileWriter("contractors.txt");
-						BufferedWriter bw = new BufferedWriter(file);
+						if (edit == 1) {
+							// edit due date
+							System.out.println("Enter Due Date: ");
+							Scanner st = new Scanner(System.in);
+							String date = st.nextLine();
 							
-						bw.write(finalStr);
-						bw.close();
-					    
-					    mainOrExit(); // go back to main menu or exit
-					} else if (edit == 4) {
-						// finalize project
-						finalizeProject();
-						
-					    mainOrExit(); // go back to main menu or exit
+							// create new project object to manipulate using selectProject method which retrieves existing projects from file
+							Project currProjectDate = selectProject(projNumInput);
+							currProjectDate.setDeadline(date);
+							
+							String newStr = currProjectDate.oneLine(currProjectDate); // final details to be saved to file
+							
+							// print confirmation output
+							System.out.println("\nThank you. Date change saved.\n"); 
+							
+						    commitProject(projNumInput, newStr); // arguments are input string and output string
+						    
+						    mainOrExit(); 
+						} else if (edit == 2) {
+							// edit balance
+							System.out.println("Enter new balance e.g '100000': ");
+							Scanner st = new Scanner(System.in);
+							Double balance = st.nextDouble();
+							st.nextLine();
+							
+							// create new project object to manipulate using selectProject method which retrieves existing projects from file
+							Project currProjectBal = selectProject(projNumInput);	
+							currProjectBal.setBalance(balance);
+							
+							String newStr = currProjectBal.oneLine(currProjectBal); // final details to be saved to file
+							
+							// print confirmation output
+							System.out.println("\nThank you. Balance updated.\n"); 
+							System.out.println(currProjectBal); 
+						   
+							commitProject(projNumInput, newStr); // arguments are input string and output string
+						    
+						    mainOrExit(); 
+						} else if (edit == 3) {
+							// edit contractor details
+							Assignee con = selectContractor(projNumInput);
+							System.out.println(con + "\n");
+							Scanner st = new Scanner(System.in);
+							String roleCon = "Contractor";
+							System.out.println("Enter updated contractor name: ");
+							String nameCon = st.nextLine();
+							System.out.println("Enter updated Tel No: ");
+							String telCon = st.nextLine();
+							System.out.println("Enter updated email: ");
+							String emailCon = st.nextLine();
+							System.out.println("Enter updated Address: ");
+							String addressCon = st.nextLine();
+							
+							// assign user inputs to new object and print confirmation output
+							Assignee conCurr = new Assignee(roleCon, nameCon, telCon, emailCon, addressCon);
+							String newStr = conCurr.oneLine(conCurr, projNumInput); // final details to be saved to file
+							
+							System.out.println("\nThank you. Contractor details Succesfully updated.\n"); 
+						    System.out.println(conCurr + "\n");
+						    
+						    // save changes to file
+						    ArrayList<String> contractorList = new ArrayList<String>();
+							
+							FileReader fileIn = new FileReader("contractors.txt");
+							BufferedReader br = new BufferedReader(fileIn);
+							
+							String line = "";
+							
+							while ((line = br.readLine()) != null) {
+								String[] lineArray = line.split(", ");		
+								if (lineArray[0].equals(projNumInput)) {
+									line = newStr;	// replace the line containing desired contractor with newStr
+								}
+								contractorList.add(line + "\n");
+							}
+							br.close();
+							
+							String finalStr = Arrays.toString(contractorList.toArray()).replace("[", "").replace("]", "");
+							finalStr = finalStr.replace("\n, ", "\n");	// remove the comma space separator for the arraylist elements	
+							
+							FileWriter file = new FileWriter("contractors.txt");
+							BufferedWriter bw = new BufferedWriter(file);
+								
+							bw.write(finalStr);
+							bw.close();
+						    
+						    mainOrExit(); // go back to main menu or exit
+						} else if (edit == 4) {
+							// finalize project
+							finalizeProject();
+							
+						    mainOrExit(); // go back to main menu or exit
+						}
 					}
-				}
-			
-			} else if (input == 3) {
-				// finalize project from main menu
-				finalizeProject();
-
-			    // go back to main menu or exit
-			    mainOrExit();
-			    
-			}else if (input == 4){
-			   	// print all outstanding projects
-				FileReader fileIn = new FileReader("projects.txt");
-				BufferedReader br = new BufferedReader(fileIn);
 				
-				String line = "";
-				
-				while ((line = br.readLine()) != null) {
-					String[] lineArray = line.split(", ");	
-					System.out.println("Project Number\t: " + lineArray[0]);
-					System.out.println("Project Name\t: " + lineArray[1]);
-					System.out.println("Project Type\t: " + lineArray[2]);
-					System.out.println("Address\t\t: " + lineArray[3]);
-					System.out.println("erf Number\t: " + lineArray[4]);
-					System.out.println("Project Fee\t: R" + lineArray[5]);
-					System.out.println("Balance\t\t: R" + lineArray[6]);
-					System.out.println("Due Date\t: " + lineArray[7] + "\n");
-				}
-				
-			}else if (input == 5){
-			   	// print all overdue projects
-				
-				// get today's date
-				LocalDate today = LocalDate.now();
-				
-				FileReader fileIn = new FileReader("projects.txt");
-				BufferedReader br = new BufferedReader(fileIn);
-				
-				String line = "";
-				
-				while ((line = br.readLine()) != null) {
-					String[] lineArray = line.split(", ");	
+				} else if (input == 3) {
+					// finalize project from main menu
+					finalizeProject();
+	
+				    // go back to main menu or exit
+				    mainOrExit();
+				    
+				}else if (input == 4){
+				   	// print all outstanding projects
+					FileReader fileIn = new FileReader("projects.txt");
+					BufferedReader br = new BufferedReader(fileIn);
 					
-					// get due date
-					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
-					String date = lineArray[7];
-					//convert String to LocalDate
-					LocalDate dueDate = LocalDate.parse(date, formatter);
+					String line = "";
 					
-					if (dueDate.isBefore(today)) {
+					while ((line = br.readLine()) != null) {
+						String[] lineArray = line.split(", ");	
 						System.out.println("Project Number\t: " + lineArray[0]);
 						System.out.println("Project Name\t: " + lineArray[1]);
 						System.out.println("Project Type\t: " + lineArray[2]);
@@ -198,16 +170,46 @@ public class PMS {
 						System.out.println("Balance\t\t: R" + lineArray[6]);
 						System.out.println("Due Date\t: " + lineArray[7] + "\n");
 					}
+					
+				}else if (input == 5){
+				   	// print all overdue projects
+					
+					// get today's date
+					LocalDate today = LocalDate.now();
+					
+					FileReader fileIn = new FileReader("projects.txt");
+					BufferedReader br = new BufferedReader(fileIn);
+					
+					String line = "";
+					
+					while ((line = br.readLine()) != null) {
+						String[] lineArray = line.split(", ");	
+						
+						// get due date
+						DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
+						String date = lineArray[7];
+						//convert String to LocalDate
+						LocalDate dueDate = LocalDate.parse(date, formatter);
+						
+						if (dueDate.isBefore(today)) {
+							System.out.println("Project Number\t: " + lineArray[0]);
+							System.out.println("Project Name\t: " + lineArray[1]);
+							System.out.println("Project Type\t: " + lineArray[2]);
+							System.out.println("Address\t\t: " + lineArray[3]);
+							System.out.println("erf Number\t: " + lineArray[4]);
+							System.out.println("Project Fee\t: R" + lineArray[5]);
+							System.out.println("Balance\t\t: R" + lineArray[6]);
+							System.out.println("Due Date\t: " + lineArray[7] + "\n");
+						}
+					}
+					br.close();
 				}
-				br.close();
-			
-			}else {
-			   	// if user enters any number on main menu other than those assigned to a function
-				System.out.println("Sorry, that function is not yet available. Please contact helpdesk.\n\n");
-			   	System.exit(0);
-				}
-		}
-	}
+				
+			} catch (InputMismatchException e) {
+				System.out.println("Please enter a number corresponding to function you want to perform.\n");
+			}
+		} 	//close while loop
+	} 	// close main method
 
 	// this method asks for an invoice date and generates a new invoice 
 	private static void finalizeProject() throws IOException {
@@ -268,11 +270,11 @@ public class PMS {
 		// capture project details
 		// auto-generate project number
 		int projectNo = 0;
+		String line = "";
 
 		FileReader fileIn = new FileReader("projectCount.txt");
 		BufferedReader br = new BufferedReader(fileIn);
 			
-		String line = "";
 		while ((line = br.readLine()) != null) {
 		    projectNo = Integer.parseInt(line) + 1;
 		}
