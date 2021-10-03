@@ -16,8 +16,7 @@ public class Project {
 	
     // Methods
     public Project(Integer projectNumber, String projectName, String buildingType, String projectAddress,
-    				String erfNumber, Double projectFee, Double projectBalance, String deadline) 
-    {
+    				String erfNumber, Double projectFee, Double projectBalance, String deadline) {
     	this.projectNumber = projectNumber;
     	this.projectName = projectName;
     	this.buildingType = buildingType;
@@ -51,5 +50,11 @@ public class Project {
     public void setBalance(Double newBalance) {
     	projectBalance = newBalance;
     }
+    
+    public String oneLine(Project currProject) {
+		String output = projectNumber + ", " + projectName + ", " + buildingType + ", " + projectAddress + ", " + erfNumber + ", " + projectFee + ", " + projectBalance + ", " + deadline;
+			   
+		return output;
+	}
 
 }
