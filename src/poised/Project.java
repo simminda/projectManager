@@ -10,9 +10,9 @@ public class Project {
 	Double projectFee;
 	Double projectBalance;
 	String deadline;
-	Assignee architect;
-	Assignee contractor;
-	Assignee customer;
+	Persons architect;
+	Persons contractor;
+	Persons customer;
 	
     // Methods
     public Project(Integer projectNumber, String projectName, String buildingType, String projectAddress,

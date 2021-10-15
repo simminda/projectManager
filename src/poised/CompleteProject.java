@@ -11,9 +11,9 @@ public class CompleteProject {
 	Double projectBalance;
 	String completionDate;
 	Double invoiceNo;
-	Assignee architect;
-	Assignee contractor;
-	Assignee customer;
+	Persons architect;
+	Persons contractor;
+	Persons customer;
 	
     // Methods
     public CompleteProject(Integer projectNumber, String projectName, String buildingType, String projectAddress,

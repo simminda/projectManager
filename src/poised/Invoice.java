@@ -3,10 +3,10 @@ package poised;
 public class Invoice {
 	Integer invoiceNo;
 	String invoiceDate;
-	Assignee customer;
+	Persons customer;
 	Double projectFee;
 
-	public Invoice(Integer invoiceNo, String invoiceDate, Assignee customer, Double projectFee) {
+	public Invoice(Integer invoiceNo, String invoiceDate, Persons customer, Double projectFee) {
 		this.invoiceNo = invoiceNo;
 		this.invoiceDate = invoiceDate;
 		this.customer = customer;
