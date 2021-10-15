@@ -1,6 +1,6 @@
 package poised;
 
-public class Assignee {
+public class Persons {
 	// Attributes
 	String role;
 	String name;
@@ -9,7 +9,7 @@ public class Assignee {
 	String address;
 			
 	// Methods
-	public Assignee(String role, String name, String tel, String email, String address) {
+	public Persons(String role, String name, String tel, String email, String address) {
 		this.role = role;
 		this.name = name;
 		this.tel = tel;
@@ -31,7 +31,7 @@ public class Assignee {
 		return output;
 	}
 
-	public String oneLine(Assignee conCurr, String projectNum) {
+	public String oneLine(Persons conCurr, String projectNum) {
 		String output = projectNum + ", " + role + ", " + name + ", " + tel + ", " + email + ", " + address;
 		
 		return output;

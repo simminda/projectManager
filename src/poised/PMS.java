@@ -1,6 +1,11 @@
 package poised;
 
 import java.io.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -37,7 +42,7 @@ public class PMS {
 						mainOrExit();
 					} else {
 						System.out.println(currProject); 	// show user current details before asking them to edit
-						Assignee currContractor = selectContractor(projNumInput); // get details of contractor for this project number
+						Persons currContractor = selectContractor(projNumInput); // get details of contractor for this project number
 						System.out.println(currContractor); 
 						
 						System.out.println("\nWhat would you like to do? ");
@@ -52,20 +57,38 @@ public class PMS {
 						
 						if (edit == 1) {
 							// edit due date
-							System.out.println("Enter Due Date: ");
+							System.out.println("Enter Due Date e.g '2020-12-31': ");
 							Scanner st = new Scanner(System.in);
-							String date = st.nextLine();
-							
-							// create new project object to manipulate using selectProject method which retrieves existing projects from file
-							Project currProjectDate = selectProject(projNumInput);
-							currProjectDate.setDeadline(date);
-							
-							String newStr = currProjectDate.oneLine(currProjectDate); // final details to be saved to file
+							String date = st.nextLine();							
+
+							try {
+								// Connect to the poisepms database, via the jdbc:mysql:
+								Connection connection = DriverManager.getConnection(
+									"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+									"otheruser",
+									"swordfish"
+									);
+								// Create a direct line to the database for running queries
+								Statement statement = connection.createStatement();
+								ResultSet results;
+								int rowsAffected;
+								// executeQuery: runs a SELECT statement and returns the results.
+								String inputStr = "SELECT * FROM projects WHERE P_NUM =" + projNumInput;
+								results = statement.executeQuery(inputStr);
+								// 
+								String outputStr = "UPDATE projects SET DUE_DATE ='" + date + "' WHERE P_NUM =" + projNumInput;
+								rowsAffected = statement.executeUpdate(outputStr); 
+								// Close connections
+								results.close();
+								statement.close();
+								connection.close();
+							} catch (SQLException e) {
+								//catch a SQLException 
+								e.printStackTrace();
+							}
 							
 							// print confirmation output
 							System.out.println("\nThank you. Date change saved.\n"); 
-							
-						    commitProject(projNumInput, newStr); // arguments are input string and output string
 						    
 						    mainOrExit(); 
 						} else if (edit == 2) {
@@ -75,22 +98,39 @@ public class PMS {
 							Double balance = st.nextDouble();
 							st.nextLine();
 							
-							// create new project object to manipulate using selectProject method which retrieves existing projects from file
-							Project currProjectBal = selectProject(projNumInput);	
-							currProjectBal.setBalance(balance);
-							
-							String newStr = currProjectBal.oneLine(currProjectBal); // final details to be saved to file
+							try {
+								// Connect to the poisepms database, via the jdbc:mysql:
+								Connection connection = DriverManager.getConnection(
+									"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+									"otheruser",
+									"swordfish"
+									);
+								// Create a direct line to the database for running queries
+								Statement statement = connection.createStatement();
+								ResultSet results;
+								int rowsAffected;
+								// executeQuery: runs a SELECT statement and returns the results.
+								String inputStr = "SELECT * FROM projects WHERE P_NUM =" + projNumInput;
+								results = statement.executeQuery(inputStr);
+								// 
+								String outputStr = "UPDATE projects SET P_BAL ='" + balance + "' WHERE P_NUM =" + projNumInput;
+								rowsAffected = statement.executeUpdate(outputStr); 
+								// Close connections
+								results.close();
+								statement.close();
+								connection.close();
+							} catch (SQLException e) {
+								//catch a SQLException 
+								e.printStackTrace();
+							}
 							
 							// print confirmation output
 							System.out.println("\nThank you. Balance updated.\n"); 
-							System.out.println(currProjectBal); 
-						   
-							commitProject(projNumInput, newStr); // arguments are input string and output string
 						    
 						    mainOrExit(); 
 						} else if (edit == 3) {
 							// edit contractor details
-							Assignee con = selectContractor(projNumInput);
+							Persons con = selectContractor(projNumInput);
 							System.out.println(con + "\n");
 							Scanner st = new Scanner(System.in);
 							String roleCon = "Contractor";
@@ -101,41 +141,43 @@ public class PMS {
 							System.out.println("Enter updated email: ");
 							String emailCon = st.nextLine();
 							System.out.println("Enter updated Address: ");
-							String addressCon = st.nextLine();
+							String addressCon = st.nextLine();	
+							String addressConF = addressCon.replace(",", "_");		// ensure user does not capture commas 
 							
 							// assign user inputs to new object and print confirmation output
-							Assignee conCurr = new Assignee(roleCon, nameCon, telCon, emailCon, addressCon);
-							String newStr = conCurr.oneLine(conCurr, projNumInput); // final details to be saved to file
+							Persons conCurr = new Persons(roleCon, nameCon, telCon, emailCon, addressConF);
 							
 							System.out.println("\nThank you. Contractor details Succesfully updated.\n"); 
 						    System.out.println(conCurr + "\n");
 						    
-						    // save changes to file
-						    ArrayList<String> contractorList = new ArrayList<String>();
-							
-							FileReader fileIn = new FileReader("contractors.txt");
-							BufferedReader br = new BufferedReader(fileIn);
-							
-							String line = "";
-							
-							while ((line = br.readLine()) != null) {
-								String[] lineArray = line.split(", ");		
-								if (lineArray[0].equals(projNumInput)) {
-									line = newStr;	// replace the line containing desired contractor with newStr
-								}
-								contractorList.add(line + "\n");
+						    // save changes to database
+						    try {
+								// Connect to the poisepms database, via the jdbc:mysql:
+								Connection connection = DriverManager.getConnection(
+									"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+									"otheruser",
+									"swordfish"
+									);
+								// Create a direct line to the database for running queries
+								Statement statement = connection.createStatement();
+								ResultSet results;
+								int rowsAffected;
+								// executeQuery: runs a SELECT statement and returns the results.
+								String inputStr = "SELECT * FROM assignees WHERE P_NUM =" + projNumInput + " AND P_ROLE = '" + roleCon + "'";
+								results = statement.executeQuery(inputStr);
+								// 
+								String outputStr = "UPDATE assignees SET P_ROLE ='" + roleCon + "', NAME = '" + nameCon + "', NUMBR = '" + telCon + "', EMAIL = '" +
+										 			emailCon + "', ADDR = '" + addressConF + "' WHERE P_NUM =" + projNumInput + " AND P_ROLE = '" + roleCon + "'";
+								rowsAffected = statement.executeUpdate(outputStr); 
+								// Close connections
+								results.close();
+								statement.close();
+								connection.close();
+							} catch (SQLException e) {
+								//catch a SQLException 
+								e.printStackTrace();
 							}
-							br.close();
-							
-							String finalStr = Arrays.toString(contractorList.toArray()).replace("[", "").replace("]", "");
-							finalStr = finalStr.replace("\n, ", "\n");	// remove the comma space separator for the arraylist elements	
-							
-							FileWriter file = new FileWriter("contractors.txt");
-							BufferedWriter bw = new BufferedWriter(file);
-								
-							bw.write(finalStr);
-							bw.close();
-						    
+						   
 						    mainOrExit(); // go back to main menu or exit
 						} else if (edit == 4) {
 							// finalize project
@@ -154,55 +196,63 @@ public class PMS {
 				    
 				}else if (input == 4){
 				   	// print all outstanding projects
-					FileReader fileIn = new FileReader("projects.txt");
-					BufferedReader br = new BufferedReader(fileIn);
-					
-					String line = "";
-					
-					while ((line = br.readLine()) != null) {
-						String[] lineArray = line.split(", ");	
-						System.out.println("Project Number\t: " + lineArray[0]);
-						System.out.println("Project Name\t: " + lineArray[1]);
-						System.out.println("Project Type\t: " + lineArray[2]);
-						System.out.println("Address\t\t: " + lineArray[3]);
-						System.out.println("erf Number\t: " + lineArray[4]);
-						System.out.println("Project Fee\t: R" + lineArray[5]);
-						System.out.println("Balance\t\t: R" + lineArray[6]);
-						System.out.println("Due Date\t: " + lineArray[7] + "\n");
+					try {
+						// Connect to the poisepms database, via the jdbc:mysql:
+						Connection connection = DriverManager.getConnection(
+							"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+							"otheruser",
+							"swordfish"
+							);
+						// Create a direct line to the database for running queries
+						Statement statement = connection.createStatement();
+						ResultSet results;
+						int rowsAffected;
+						// executeQuery: runs a SELECT statement and returns the results.
+						String inputStr = "SELECT P_NAME FROM projects";
+						results = statement.executeQuery(inputStr);
+						
+						printAllFromTable(statement);
+						System.out.println("");
+						
+						// Close connections
+						results.close();
+						statement.close();
+						connection.close();
+					} catch (SQLException e) {
+						//catch a SQLException 
+						e.printStackTrace();
 					}
 					
+					mainOrExit();
 				}else if (input == 5){
 				   	// print all overdue projects
 					
-					// get today's date
-					LocalDate today = LocalDate.now();
-					
-					FileReader fileIn = new FileReader("projects.txt");
-					BufferedReader br = new BufferedReader(fileIn);
-					
-					String line = "";
-					
-					while ((line = br.readLine()) != null) {
-						String[] lineArray = line.split(", ");	
-						
-						// get due date
-						DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
-						String date = lineArray[7];
-						//convert String to LocalDate
-						LocalDate dueDate = LocalDate.parse(date, formatter);
-						
-						if (dueDate.isBefore(today)) {
-							System.out.println("Project Number\t: " + lineArray[0]);
-							System.out.println("Project Name\t: " + lineArray[1]);
-							System.out.println("Project Type\t: " + lineArray[2]);
-							System.out.println("Address\t\t: " + lineArray[3]);
-							System.out.println("erf Number\t: " + lineArray[4]);
-							System.out.println("Project Fee\t: R" + lineArray[5]);
-							System.out.println("Balance\t\t: R" + lineArray[6]);
-							System.out.println("Due Date\t: " + lineArray[7] + "\n");
-						}
+					try {
+						// Connect to the poisepms database, via the jdbc:mysql:
+						Connection connection = DriverManager.getConnection(
+							"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+							"otheruser",
+							"swordfish"
+							);
+						// Create a direct line to the database for running queries
+						Statement statement = connection.createStatement();
+						ResultSet results;
+						int rowsAffected;
+						// executeQuery: runs a SELECT statement and returns the results.
+						results = statement.executeQuery("SELECT * FROM Projects");		
+						// print projects
+						printOverdueFromTable(statement);
+						System.out.println("");
+						// Close connections
+						results.close();
+						statement.close();
+						connection.close();
+					} catch (SQLException e) {
+						//catch a SQLException 
+						e.printStackTrace();
 					}
-					br.close();
+					
+					mainOrExit();
 				}
 				
 			} catch (InputMismatchException e) {
@@ -211,82 +261,44 @@ public class PMS {
 		} 	//close while loop
 	} 	// close main method
 
-	// this method asks for an invoice date and generates a new invoice 
-	private static void finalizeProject() throws IOException {
-		System.out.println("Enter project number: ");
-		Scanner sc = new Scanner(System.in);
-		String in = sc.nextLine();
-		
-		Project fProject = selectProject(in); 
-		Assignee con = selectContact(in);
-		System.out.println(fProject + "\n");
-		System.out.println(con + "\n");
-
-		// add completion date
-		System.out.println("Enter Completion Date: ");
-		Scanner st = new Scanner(System.in);
-		String date = st.nextLine();
-		
-		// generate unique invoice number
-		int invoiceNo;
-
-		FileReader fileIn = new FileReader("invCount.txt");
-		BufferedReader br = new BufferedReader(fileIn);
-			
-		String line = "";
-		
-		while ((line = br.readLine()) != null) {
-		    invoiceNo = Integer.parseInt(line) + 1;
-			Invoice invoice = new Invoice(invoiceNo, date, con, getBalance(in));
-				
-			System.out.println("\nThank you.\n"); 
-			System.out.println(invoice + "\n");
-				
-			// save current invoice number to file
-			FileWriter fileOut = new FileWriter("invCount.txt");
-			BufferedWriter bw = new BufferedWriter(fileOut);
-			bw.write(""+ invoiceNo);
-			bw.close();
-				
-			// save completed project to file 
-			String newStr = fProject.oneLine(fProject); // final details to be saved to file
-				
-			FileWriter file = new FileWriter("completeProject.txt", true);
-			BufferedWriter buffer = new BufferedWriter(file);
-					
-			buffer.write(newStr + "\n");
-			buffer.close();
-		}
-		
-		// remove completed project from current projects file
-		removeLineFromFile(in);
-			
-	    mainOrExit(); // go back to main menu or exit
-		
-	}
-
-	// this method asks the user to capture all details and writes to file
+	
+	// this method generates a project number, asks the user to capture all details and saves to database
 	private static void captureProject() throws IOException {
 		// capture project details
+		
 		// auto-generate project number
 		int projectNo = 0;
-		String line = "";
-
-		FileReader fileIn = new FileReader("projectCount.txt");
-		BufferedReader br = new BufferedReader(fileIn);
-			
-		while ((line = br.readLine()) != null) {
-		    projectNo = Integer.parseInt(line) + 1;
-			
-		}
-		br.close();
 		
-		// save new project number to file 
-		FileWriter fileP = new FileWriter("projectCount.txt");
-		BufferedWriter bufferP = new BufferedWriter(fileP);
-						
-		bufferP.write("" + projectNo);
-		bufferP.close(); 
+		try {
+			// Connect to the poisepms database, via the jdbc:mysql:
+			Connection connection = DriverManager.getConnection(
+				"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+				"otheruser",
+				"swordfish"
+				);
+			// Create a direct line to the database for running queries
+			Statement statement = connection.createStatement();
+			ResultSet results;
+			int rowsAffected;
+			// executeQuery: runs a SELECT statement and returns the results.
+			results = statement.executeQuery("SELECT * FROM projectCount");
+			// get last project number
+			int pNum = 0;
+			while (results.next()) {
+				pNum = results.getInt(1);
+				//System.out.println(pNum);;
+			}
+			projectNo = pNum + 1;
+			rowsAffected = statement.executeUpdate("UPDATE projectCount SET P_NUM=" + projectNo); 
+			// Close connections
+			results.close();
+			statement.close();
+			connection.close();
+			
+		} catch (SQLException e) {
+			//catch a SQLException 
+			e.printStackTrace();
+		}
 		
 		// ask user to capture rest of details
 		Scanner details = new Scanner(System.in);
@@ -296,7 +308,7 @@ public class PMS {
 		String buildingType = details.nextLine();
 		System.out.println("Enter project address: ");
 		String projectAddress = details.nextLine();
-		String projectAddressF = projectAddress.replace(',', '_'); // ensure user does not capture commas (file separator is commas)
+		String projectAddressF = projectAddress.replace(',', '_'); // ensure user does not capture commas 
 		System.out.println("Enter erf number: ");
 		String erfNumber = details.nextLine();
 		System.out.println("Enter project Fee (e.g. '10000'): ");
@@ -304,7 +316,7 @@ public class PMS {
 		System.out.println("Enter Outstanding balance (e.g. '10000'): ");
 		Double projectBalance = details.nextDouble();
 		details.nextLine();
-		System.out.println("Enter project deadline (e.g. '31/12/2010'): ");
+		System.out.println("Enter project deadline (e.g. '2010-12-31'): ");
 		String deadline = details.nextLine();
 		
 		// assign user inputs to new object and print confirmation output
@@ -313,15 +325,35 @@ public class PMS {
 		System.out.println("\nThank you. Project Succesfully Captured.\n"); 
 		System.out.println(currProject + "\n");
 		
-		// save changes to file 
-		String newStr = currProject.oneLine(currProject); // final details to be saved to file
-		
-		FileWriter file = new FileWriter("projects.txt", true);
-		BufferedWriter buffer = new BufferedWriter(file);
+		// save new project to database  
+		try {
+			// Connect to the poisepms database, via the jdbc:mysql:
+			Connection connection = DriverManager.getConnection(
+				"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+				"otheruser",
+				"swordfish"
+				);
+			// Create a direct line to the database for running queries
+			Statement statement = connection.createStatement();
+			ResultSet results;
+			int rowsAffected;
+			// executeQuery: runs a SELECT statement and returns the results.
+			results = statement.executeQuery("SELECT * FROM Projects");
 			
-		buffer.write(newStr + "\n");
-		buffer.close();    
-		
+			// save 
+			String output = "INSERT INTO Projects VALUES (" + projectNo + ", '" + projectName + "', '" + buildingType + "', '" + projectAddressF + "', '" 
+			+ erfNumber + "', " + projectFee + ", " + projectBalance + ", '" + deadline + "')";
+			rowsAffected = statement.executeUpdate(output); 
+			System.out.println("Query complete, " + rowsAffected + " rows updated.\n");
+			// Close connections
+			results.close();
+			statement.close();
+			connection.close();
+			
+		} catch (SQLException e) {
+			//catch a SQLException 
+			e.printStackTrace();
+		}
 
 		// capture customer person
 		String role = "Contact";
@@ -336,19 +368,40 @@ public class PMS {
 		String addressF = address.replace(",", "_");	// ensure user does not capture commas (file separator is commas)
 		
 		// assign user inputs to new object and print confirmation output
-		Assignee person = new Assignee(role, name, tel, email, addressF);
+		Persons person = new Persons(role, name, tel, email, addressF);
 		System.out.println("\nThank you. Details Succesfully Captured.\n"); 
 		System.out.println(person + "\n");
 		
-		// save changes to file 
-		String newStr1 = person.oneLine(person, ("" + projectNo)); // final details to be saved to file
-				
-		FileWriter file1 = new FileWriter("contacts.txt", true);
-		BufferedWriter buffer1 = new BufferedWriter(file1);
-					
-		buffer1.write(newStr1 + "\n");
-		buffer1.close(); 	
-		
+		// save changes to databases
+		try {
+			// Connect to the poisepms database, via the jdbc:mysql:
+			Connection connection = DriverManager.getConnection(
+				"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+				"otheruser",
+				"swordfish"
+				);
+			// Create a direct line to the database for running queries
+			Statement statement = connection.createStatement();
+			ResultSet results;
+			int rowsAffected;
+			// executeQuery: runs a SELECT statement and returns the results.
+			results = statement.executeQuery("SELECT * FROM Assignees");
+			
+			// save 
+			String output = "INSERT INTO Assignees VALUES (" + projectNo + ", '" + role + "', '" + name + "', '" + tel + "', '" 
+			+ email + "', '" + addressF + "')";
+			rowsAffected = statement.executeUpdate(output); 
+			System.out.println("Query complete, " + rowsAffected + " rows updated.\n");
+			// Close connections
+			results.close();
+			statement.close();
+			connection.close();
+			
+		} catch (SQLException e) {
+			//catch a SQLException 
+			e.printStackTrace();
+		}
+		 		
 		// capture architect
 		String roleArc = "Architect";
 		System.out.println("Enter architect name: ");
@@ -359,21 +412,42 @@ public class PMS {
 		String emailArc = details.nextLine();
 		System.out.println("Enter Address: ");
 		String addressArc = details.nextLine();
-		String addressArcF = addressArc.replace(",", "_");		// ensure user does not capture commas (file separator is commas)
+		String addressArcF = addressArc.replace(",", "_");		// ensure user does not capture commas 
 		
 		// assign user inputs to new object and print confirmation output
-		Assignee arc = new Assignee(roleArc, nameArc, telArc, emailArc, addressArcF);
+		Persons arc = new Persons(roleArc, nameArc, telArc, emailArc, addressArcF);
 		System.out.println("\nThank you. Details Succesfully Captured.\n"); 
 		System.out.println(arc + "\n");
 		
-		// save changes to file 
-		String newStr2 = arc.oneLine(arc, ("" + projectNo)); // final details to be saved to file
-				
-		FileWriter file2 = new FileWriter("architects.txt", true);
-		BufferedWriter buffer2 = new BufferedWriter(file2);
-					
-		buffer2.write(newStr2 + "\n");
-		buffer2.close(); 
+		// save changes to databases
+		try {
+			// Connect to the poisepms database, via the jdbc:mysql:
+			Connection connection = DriverManager.getConnection(
+				"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+				"otheruser",
+				"swordfish"
+				);
+			// Create a direct line to the database for running queries
+			Statement statement = connection.createStatement();
+			ResultSet results;
+			int rowsAffected;
+			// executeQuery: runs a SELECT statement and returns the results.
+			results = statement.executeQuery("SELECT * FROM Assignees");
+			
+			// save 
+			String output = "INSERT INTO Assignees VALUES (" + projectNo + ", '" + roleArc + "', '" + nameArc + "', '" + telArc + "', '" 
+			+ emailArc + "', '" + addressArcF + "')";
+			rowsAffected = statement.executeUpdate(output); 
+			System.out.println("Query complete, " + rowsAffected + " rows updated.\n");
+			// Close connections
+			results.close();
+			statement.close();
+			connection.close();
+			
+		} catch (SQLException e) {
+			//catch a SQLException 
+			e.printStackTrace();
+		}
 		
 		// capture contractor
 		String roleCon = "Contractor";
@@ -388,19 +462,146 @@ public class PMS {
 		String addressConF = addressCon.replace(",", "_"); 	// ensure user does not capture commas (file separator is commas)
 		
 		// assign user inputs to new object and print confirmation output
-		Assignee con = new Assignee(roleCon, nameCon, telCon, emailCon, addressConF);
+		Persons con = new Persons(roleCon, nameCon, telCon, emailCon, addressConF);
 		System.out.println("\nThank you. Details Succesfully Captured.\n"); 
 		System.out.println(con + "\n");
 		
-		// save changes to file 
-		String newStr3 = con.oneLine(con, ("" + projectNo)); // final details to be saved to file
-				
-		FileWriter file3 = new FileWriter("contractors.txt", true);
-		BufferedWriter buffer3 = new BufferedWriter(file3);
-					
-		buffer3.write(newStr3 + "\n");
-		buffer3.close(); 
+		// save changes to databases
+		try {
+			// Connect to the poisepms database, via the jdbc:mysql:
+			Connection connection = DriverManager.getConnection(
+				"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+				"otheruser",
+				"swordfish"
+				);
+			// Create a direct line to the database for running queries
+			Statement statement = connection.createStatement();
+			ResultSet results;
+			int rowsAffected;
+			// executeQuery: runs a SELECT statement and returns the results.
+			results = statement.executeQuery("SELECT * FROM Assignees");
+			
+			// save 
+			String output = "INSERT INTO Assignees VALUES (" + projectNo + ", '" + roleCon + "', '" + nameCon + "', '" + telCon + "', '" 
+			+ emailCon + "', '" + addressConF + "')";
+			rowsAffected = statement.executeUpdate(output); 
+			System.out.println("Query complete, " + rowsAffected + " rows updated.\n");
+			// Close connections
+			results.close();
+			statement.close();
+			connection.close();
+			
+		} catch (SQLException e) {
+			//catch a SQLException 
+			e.printStackTrace();
+		}
 	}
+	
+	// this method asks for an invoice date and generates a new invoice 
+		private static void finalizeProject() throws IOException {
+			System.out.println("Enter project number: ");
+			Scanner sc = new Scanner(System.in);
+			String in = sc.nextLine();
+			
+			Project fProject = selectProject(in); 
+			Persons con = selectContact(in);
+			System.out.println(fProject + "\n");
+			System.out.println(con + "\n");
+
+			// add completion date
+			System.out.println("Enter Completion Date: ");
+			Scanner st = new Scanner(System.in);
+			String date = st.nextLine();
+			
+			// auto-generate invoice number
+					int invNo = 0;
+					
+					try {
+						// Connect to the poisepms database, via the jdbc:mysql:
+						Connection connection = DriverManager.getConnection(
+							"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+							"otheruser",
+							"swordfish"
+							);
+						// Create a direct line to the database for running queries
+						Statement statement = connection.createStatement();
+						ResultSet results;
+						int rowsAffected;
+						// executeQuery: runs a SELECT statement and returns the results.
+						results = statement.executeQuery("SELECT * FROM invCount");
+						// get last invoice number
+						int tempNo = 0;
+						while (results.next()) {
+							tempNo = results.getInt(1);
+						}
+						invNo = tempNo + 1;
+						rowsAffected = statement.executeUpdate("UPDATE invCount SET INV_NUM =" + invNo); 
+						// Close connections
+						results.close();
+						statement.close();
+						connection.close();
+					} catch (SQLException e) {
+						//catch a SQLException 
+						e.printStackTrace();
+					}
+					
+				// print invoice details to user
+				Invoice invoice = new Invoice(invNo, date, con, getBalance(in));
+					
+				System.out.println("\nThank you.\n"); 
+				System.out.println(invoice + "\n");
+								
+				// save completed project to database 
+				try {
+					// Connect to the poisepms database, via the jdbc:mysql:
+					Connection connection = DriverManager.getConnection(
+						"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+						"otheruser",
+						"swordfish"
+						);
+					// Create a direct line to the database for running queries
+					Statement statement = connection.createStatement();
+					ResultSet results;
+					int rowsAffected;
+					// executeQuery: runs a SELECT statement and returns the results.
+					results = statement.executeQuery("SELECT * FROM Projects WHERE P_NUM = " + in);
+					
+					// get project from database
+					int P_NUM = 0;
+					String P_NAME, P_TYPE, P_ADDR, ERF_NUM, DUE_DATE;
+					Double P_FEE, P_BAL;
+					while (results.next()) {
+						P_NUM = results.getInt(1);
+						P_NAME = results.getString(2);
+						P_TYPE = results.getString(3);
+						P_ADDR = results.getString(4);
+						ERF_NUM = results.getString(5);
+						P_FEE = results.getDouble(6);
+						P_BAL = results.getDouble(7);
+						DUE_DATE = results.getString(8);			
+
+					// save to complete project
+					String output = "INSERT INTO CompleteProjects VALUES (" + P_NUM + ", '" + P_NAME + "', '" + P_TYPE + "', '" + P_ADDR + "', '" 
+					+ ERF_NUM + "', " + P_FEE + ", " + P_BAL + ", '" + DUE_DATE +  "', " + invNo + ")";
+					rowsAffected = statement.executeUpdate(output); 
+					System.out.println("Query complete, " + rowsAffected + " rows added to completeProjects.\n");
+					
+					// delete from active projects
+					String out = "DELETE FROM projects WHERE P_NUM = " + in;
+					rowsAffected = statement.executeUpdate(out); 
+					System.out.println("Query complete, " + rowsAffected + " rows deleted from projects.");
+					}
+					// Close connections
+					results.close();
+					statement.close();
+					connection.close();
+				} catch (SQLException e) {
+					//catch a SQLException 
+				}
+				System.out.println("");
+				
+				mainOrExit(); // offer option to go back to main menu or exit	
+		}
 
 	// this method allows user to exit or go back to the main menu
 	private static void mainOrExit() {
@@ -425,133 +626,197 @@ public class PMS {
 	}
 	
 	// this method gets and returns the project details for a given project number or project name
-	public static Project selectProject(String projectNumOrName) throws IOException {
+	public static Project selectProject(String projectNum) throws IOException {
 		Project currProject = null;
-		FileReader fileIn = new FileReader("projects.txt");
-		BufferedReader br = new BufferedReader(fileIn);
 		
-		int counter = 0;
-		String line = "";
-		while ((line=br.readLine())!= null) {
-			String[] lineArray = line.split(", ");		
-			if (lineArray[0].equals(projectNumOrName) || lineArray[1].equals(projectNumOrName)) {
-				counter += 1;
-				currProject = new Project(Integer.parseInt(projectNumOrName), lineArray[1], lineArray[2], lineArray[3], lineArray[4],
-						Double.parseDouble(lineArray[5]), Double.parseDouble(lineArray[6]), lineArray[7]);
-				selectContractor(projectNumOrName);
+		try {
+			// Connect to the poisepms database, via the jdbc:mysql:
+			Connection connection = DriverManager.getConnection(
+				"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+				"otheruser",
+				"swordfish"
+				);
+			// Create a direct line to the database for running queries
+			Statement statement = connection.createStatement();
+			ResultSet results;
+			int rowsAffected;
+			// executeQuery: runs a SELECT statement and returns the results.
+			String input = "SELECT * FROM projects WHERE P_NUM =" + projectNum;
+			results = statement.executeQuery(input);
+			// get project from database
+			int P_NUM = 0;
+			String P_NAME, P_TYPE, P_ADDR, ERF_NUM, DUE_DATE;
+			Double P_FEE, P_BAL;
+			while (results.next()) {
+				P_NUM = results.getInt(1);
+				P_NAME = results.getString(2);
+				P_TYPE = results.getString(3);
+				P_ADDR = results.getString(4);
+				ERF_NUM = results.getString(5);
+				P_FEE = results.getDouble(6);
+				P_BAL = results.getDouble(7);
+				DUE_DATE = results.getString(8);
+							
+				currProject = new Project(P_NUM, P_NAME, P_TYPE, P_ADDR, ERF_NUM, P_FEE, P_BAL, DUE_DATE);
 			}
-		}
-		if (counter == 0) {
-				System.out.println("Project number not found\n");
-				return null;
-		}
+			// Close connections
+			results.close();
+			statement.close();
+			connection.close();
+			
+		} catch (SQLException e) {
+			//catch a SQLException 
+			e.printStackTrace();
+		}	
 		return currProject; 
 	}
 	
 	// this method gets and returns the contractor for a given project number
-	public static Assignee selectContractor(String projectNumber) throws IOException {
-		Assignee currContractor = null;
-		FileReader fileIn = new FileReader("contractors.txt");
-		BufferedReader br = new BufferedReader(fileIn);
+	public static Persons selectContractor(String projectNumber) throws IOException {
+		Persons currContractor = null;
 		
-		String line = "";	
-		while ((line=br.readLine())!= null) {
-			String[] lineArray = line.split(", ");		
-			if (line.contains(projectNumber)) {
-				currContractor = new Assignee(lineArray[1], lineArray[2], lineArray[3], lineArray[4], lineArray[5]);
+		try {
+			// Connect to the poisepms database, via the jdbc:mysql:
+			Connection connection = DriverManager.getConnection(
+				"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+				"otheruser",
+				"swordfish"
+				);
+			// Create a direct line to the database for running queries
+			Statement statement = connection.createStatement();
+			ResultSet results;
+			// executeQuery: runs a SELECT statement and returns the results.
+			String input = "SELECT * FROM Assignees WHERE P_NUM =" + projectNumber + " AND P_ROLE = 'Contractor'";
+			results = statement.executeQuery(input);
+			// get persons from database
+			String P_ROLE, NAME, NUMBR, EMAIL, ADDR;
+
+			while (results.next()) {
+				P_ROLE = results.getString(2);
+				NAME = results.getString(3);
+				NUMBR = results.getString(4);
+				EMAIL = results.getString(5);
+				ADDR = results.getString(6);
+							
+				currContractor = new Persons(P_ROLE, NAME, NUMBR, EMAIL, ADDR);
 			}
+			// Close connections
+			results.close();
+			statement.close();
+			connection.close();
+		} catch (SQLException e) {
+			//catch a SQLException 
+			e.printStackTrace();
 		}
 		return currContractor; 
 	}
 	
 	// this method gets and returns the customer/contact for a given project number
-	public static Assignee selectContact(String projectNumber) throws IOException {
-		Assignee currContact = null;
-		FileReader fileIn = new FileReader("contacts.txt");
-		BufferedReader br = new BufferedReader(fileIn);
+	public static Persons selectContact(String projectNumber) throws IOException {
+		Persons currContact = null;
 		
-		String line = "";	
-		while ((line=br.readLine())!= null) {
-			String[] lineArray = line.split(", ");		
-			if (line.contains(projectNumber)) {
-				currContact = new Assignee(lineArray[1], lineArray[2], lineArray[3], lineArray[4], lineArray[5]);
+		try {
+			// Connect to the poisepms database, via the jdbc:mysql:
+			Connection connection = DriverManager.getConnection(
+				"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+				"otheruser",
+				"swordfish"
+				);
+			// Create a direct line to the database for running queries
+			Statement statement = connection.createStatement();
+			ResultSet results;
+			// executeQuery: runs a SELECT statement and returns the results.
+			String input = "SELECT * FROM Assignees WHERE P_NUM =" + projectNumber + " AND P_ROLE = 'Contact'";
+			results = statement.executeQuery(input);
+			// get persons/assignees from database
+			String P_ROLE, NAME, NUMBR, EMAIL, ADDR;
+
+			while (results.next()) {
+				P_ROLE = results.getString(2);
+				NAME = results.getString(3);
+				NUMBR = results.getString(4);
+				EMAIL = results.getString(5);
+				ADDR = results.getString(6);
+							
+				currContact = new Persons(P_ROLE, NAME, NUMBR, EMAIL, ADDR);
 			}
+			// Close connections
+			results.close();
+			statement.close();
+			connection.close();
+		} catch (SQLException e) {
+			//catch a SQLException 
+			e.printStackTrace();
 		}
 		return currContact; 
 	}
 	
 	// this method gets the balance customer is still owing
 	public static Double getBalance(String projectNum) throws IOException {
-		Project currProject = null;
-		FileReader fileIn = new FileReader("projects.txt");
-		BufferedReader br = new BufferedReader(fileIn);
+		Double P_BAL = 0.00;
 		
-		Double balance = null;
-		String line = "";
-		while ((line=br.readLine())!= null) {
-			String[] lineArray = line.split(", ");		
-			if (line.contains(projectNum)) {
-				currProject = new Project(Integer.parseInt(projectNum), lineArray[1], lineArray[2], lineArray[3], lineArray[4],
-						Double.parseDouble(lineArray[5]), Double.parseDouble(lineArray[6]), lineArray[7]);
-				balance = Double.parseDouble(lineArray[6]);
+		try {
+			// Connect to the poisepms database, via the jdbc:mysql:
+			Connection connection = DriverManager.getConnection(
+				"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+				"otheruser",
+				"swordfish"
+				);
+			// Create a direct line to the database for running queries
+			Statement statement = connection.createStatement();
+			ResultSet results;
+			// executeQuery: runs a SELECT statement and returns the results.
+			String input = "SELECT * FROM projects WHERE P_NUM =" + projectNum;
+			results = statement.executeQuery(input);
+			
+			// get info from database	
+			while (results.next()) {
+				P_BAL = results.getDouble(7);
 			}
+			// Close connections
+			results.close();
+			statement.close();
+			connection.close();
+		} catch (SQLException e) {
+			//catch a SQLException 
+			e.printStackTrace();
 		}
-		return balance; 
+		return P_BAL; 
 	}
 	
-	// this method saves/commits changes to file 
-	public static void commitProject(String projectNum, String newStr) throws IOException {
-		// Declare ArrayList to store and manipulate projects
-		ArrayList<String> projectList = new ArrayList<String>();
-		
-		FileReader fileIn = new FileReader("projects.txt");
-		BufferedReader br = new BufferedReader(fileIn);
-		
-		String line = "";
-		
-		while ((line = br.readLine()) != null) {
-			if (line.contains(projectNum)) {
-				line = newStr;	// replace the line containing desired project num with newStr
-			}
-			projectList.add(line + "\n");
+	// this method prints all projects
+	public static void printAllFromTable(Statement statement) throws SQLException {
+		ResultSet results = statement.executeQuery("SELECT * FROM projects");
+			while (results.next()) {
+				System.out.println(
+				results.getInt("P_NUM") + ", "
+				+ results.getString("P_NAME") + ", "
+				+ results.getString("P_TYPE") + ", "
+				+ results.getString("P_ADDR") + ", "
+				+ results.getString("ERF_NUM") + ", "
+				+ results.getDouble("P_FEE") + ", "
+				+ results.getDouble("P_BAL") + ", "
+				+ results.getString("DUE_DATE") 
+			);
 		}
-		br.close();
-		
-		String finalStr = Arrays.toString(projectList.toArray()).replace("[", "").replace("]", "");
-		finalStr = finalStr.replace("\n, ", "\n");	// remove the comma space separator for the arraylist elements	
-		
-		FileWriter file = new FileWriter("projects.txt");
-		BufferedWriter bw = new BufferedWriter(file);
-			
-		bw.write(finalStr);
-		bw.close();
 	}
 	
-	// this method deletes line from a text file
-	public static void removeLineFromFile(String projectNum) throws FileNotFoundException, IOException {
-		ArrayList<String> projectList = new ArrayList<String>();
-		
-		FileReader fileIn = new FileReader("projects.txt");
-		BufferedReader br = new BufferedReader(fileIn);
-		
-		String line = "";
-		
-		while ((line = br.readLine()) != null) {
-			if (line.contains(projectNum)) {
-				continue;
-			}
-			projectList.add(line + "\n");
+	// this method prints all overdue projects
+	public static void printOverdueFromTable(Statement statement) throws SQLException {
+		LocalDate today = LocalDate.now();
+		ResultSet results = statement.executeQuery("SELECT * FROM projects WHERE DUE_DATE < now()");
+			while (results.next()) {
+				System.out.println(
+				results.getInt("P_NUM") + ", "
+				+ results.getString("P_NAME") + ", "
+				+ results.getString("P_TYPE") + ", "
+				+ results.getString("P_ADDR") + ", "
+				+ results.getString("ERF_NUM") + ", "
+				+ results.getDouble("P_FEE") + ", "
+				+ results.getDouble("P_BAL") + ", "
+				+ results.getString("DUE_DATE") 
+			);
 		}
-		br.close();
-		
-		String finalStr = Arrays.toString(projectList.toArray()).replace("[", "").replace("]", "");
-		finalStr = finalStr.replace("\n, ", "\n");	// remove the comma space separator for the arraylist elements	
-		
-		FileWriter file = new FileWriter("projects.txt");
-		BufferedWriter bw = new BufferedWriter(file);
-			
-		bw.write(finalStr);
-		bw.close();
 	}
 	
 }
