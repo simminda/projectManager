@@ -1,7 +1,0 @@
-121, Contact, Tom Raymond, 0834001234, tom87@live.com, 14 York Drive_Suburban_Howick_4000
-122, Contact, Sipho Ngwenya, 0711011200, sipho.n@live.com, 127 Mopeli Street_Riverlea_Johannesburg_1000
-123, Contact, Morne Trust, 0112002001, info@mornetrust.com, 10 Outer Road_Edenvale_1600
-124, Contact, Brian Griffin, 0711001002, brian@fox.com, 1052 Mahlangu Street_Brickville_Tembisa_1600
-125, Contact, Gift Mpho, 0834004000, giftmpho@gmail.com, 25 Darlington Drive_Heights_Secunda_1000
-126, Contact, Schnooks Sedumedi, 0619122990, schnooks92@gmail.com, 1 Rebecca Thlap Drive_ Kagiso Ext 12_ Krugersdorp_ 1600
-127, Contact, Senzi Ndaba, 0731645746, senzi.ndaba@kznmail.co.za, 67 Glen Road_ Woodlands_ Durban_ 4004
