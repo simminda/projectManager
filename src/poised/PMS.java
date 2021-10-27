@@ -64,7 +64,7 @@ public class PMS {
 							try {
 								// Connect to the poisepms database, via the jdbc:mysql:
 								Connection connection = DriverManager.getConnection(
-									"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+									"jdbc:mysql://localhost:3306/poisepms?allowPublicKeyRetrieval=true&useSSL=false",
 									"otheruser",
 									"swordfish"
 									);
@@ -101,7 +101,7 @@ public class PMS {
 							try {
 								// Connect to the poisepms database, via the jdbc:mysql:
 								Connection connection = DriverManager.getConnection(
-									"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+									"jdbc:mysql://localhost:3306/poisepms?allowPublicKeyRetrieval=true&useSSL=false",
 									"otheruser",
 									"swordfish"
 									);
@@ -154,7 +154,7 @@ public class PMS {
 						    try {
 								// Connect to the poisepms database, via the jdbc:mysql:
 								Connection connection = DriverManager.getConnection(
-									"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+									"jdbc:mysql://localhost:3306/poisepms?allowPublicKeyRetrieval=true&useSSL=false",
 									"otheruser",
 									"swordfish"
 									);
@@ -199,7 +199,7 @@ public class PMS {
 					try {
 						// Connect to the poisepms database, via the jdbc:mysql:
 						Connection connection = DriverManager.getConnection(
-							"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+							"jdbc:mysql://localhost:3306/poisepms?allowPublicKeyRetrieval=true&useSSL=false",
 							"otheruser",
 							"swordfish"
 							);
@@ -230,7 +230,7 @@ public class PMS {
 					try {
 						// Connect to the poisepms database, via the jdbc:mysql:
 						Connection connection = DriverManager.getConnection(
-							"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+							"jdbc:mysql://localhost:3306/poisepms?allowPublicKeyRetrieval=true&useSSL=false", 
 							"otheruser",
 							"swordfish"
 							);
@@ -272,7 +272,7 @@ public class PMS {
 		try {
 			// Connect to the poisepms database, via the jdbc:mysql:
 			Connection connection = DriverManager.getConnection(
-				"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+				"jdbc:mysql://localhost:3306/poisepms?allowPublicKeyRetrieval=true&useSSL=false",
 				"otheruser",
 				"swordfish"
 				);
@@ -329,7 +329,7 @@ public class PMS {
 		try {
 			// Connect to the poisepms database, via the jdbc:mysql:
 			Connection connection = DriverManager.getConnection(
-				"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+				"jdbc:mysql://localhost:3306/poisepms?allowPublicKeyRetrieval=true&useSSL=false",
 				"otheruser",
 				"swordfish"
 				);
@@ -376,7 +376,7 @@ public class PMS {
 		try {
 			// Connect to the poisepms database, via the jdbc:mysql:
 			Connection connection = DriverManager.getConnection(
-				"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+				"jdbc:mysql://localhost:3306/poisepms?allowPublicKeyRetrieval=true&useSSL=false",
 				"otheruser",
 				"swordfish"
 				);
@@ -423,7 +423,7 @@ public class PMS {
 		try {
 			// Connect to the poisepms database, via the jdbc:mysql:
 			Connection connection = DriverManager.getConnection(
-				"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+				"jdbc:mysql://localhost:3306/poisepms?allowPublicKeyRetrieval=true&useSSL=false",
 				"otheruser",
 				"swordfish"
 				);
@@ -470,7 +470,7 @@ public class PMS {
 		try {
 			// Connect to the poisepms database, via the jdbc:mysql:
 			Connection connection = DriverManager.getConnection(
-				"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+				"jdbc:mysql://localhost:3306/poisepms?allowPublicKeyRetrieval=true&useSSL=false",
 				"otheruser",
 				"swordfish"
 				);
@@ -519,7 +519,7 @@ public class PMS {
 					try {
 						// Connect to the poisepms database, via the jdbc:mysql:
 						Connection connection = DriverManager.getConnection(
-							"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+							"jdbc:mysql://localhost:3306/poisepms?allowPublicKeyRetrieval=true&useSSL=false",
 							"otheruser",
 							"swordfish"
 							);
@@ -555,7 +555,7 @@ public class PMS {
 				try {
 					// Connect to the poisepms database, via the jdbc:mysql:
 					Connection connection = DriverManager.getConnection(
-						"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+						"jdbc:mysql://localhost:3306/poisepms?allowPublicKeyRetrieval=true&useSSL=false",
 						"otheruser",
 						"swordfish"
 						);
@@ -632,7 +632,7 @@ public class PMS {
 		try {
 			// Connect to the poisepms database, via the jdbc:mysql:
 			Connection connection = DriverManager.getConnection(
-				"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+				"jdbc:mysql://localhost:3306/poisepms?allowPublicKeyRetrieval=true&useSSL=false",
 				"otheruser",
 				"swordfish"
 				);
@@ -678,7 +678,7 @@ public class PMS {
 		try {
 			// Connect to the poisepms database, via the jdbc:mysql:
 			Connection connection = DriverManager.getConnection(
-				"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+				"jdbc:mysql://localhost:3306/poisepms?allowPublicKeyRetrieval=true&useSSL=false",
 				"otheruser",
 				"swordfish"
 				);
@@ -718,7 +718,7 @@ public class PMS {
 		try {
 			// Connect to the poisepms database, via the jdbc:mysql:
 			Connection connection = DriverManager.getConnection(
-				"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+				"jdbc:mysql://localhost:3306/poisepms?allowPublicKeyRetrieval=true&useSSL=false",
 				"otheruser",
 				"swordfish"
 				);
@@ -758,7 +758,7 @@ public class PMS {
 		try {
 			// Connect to the poisepms database, via the jdbc:mysql:
 			Connection connection = DriverManager.getConnection(
-				"jdbc:mysql://localhost:3306/poisepms?useSSL=false",
+				"jdbc:mysql://localhost:3306/poisepms?allowPublicKeyRetrieval=true&useSSL=false",
 				"otheruser",
 				"swordfish"
 				);
